@@ -1,25 +1,25 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
-export const counterContext = createContext();
+export const ThemeContext = createContext();
 
-const CounterContext = ({ children }) => {
-    const [counter, setCounter] = useState(0);
+export const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+  // Cada vez que el tema cambie, actualiza el localStorage
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.body.className =
+      theme === "dark" ? "bg-[#040918]" : "bg-[#EBF2FC]";
+  }, [theme]);
 
-    const increment = () => {
-        setCounter(counter + 1);
-    }
-    const decrement = () => {
-        setCounter(counter - 1);
-    }
-    const reset = () => {
-        setCounter(0);
-    }
-    return(
-        <counterContext.Provider value={{ counter, setCounter, increment, decrement, reset }}>
-            {children}
-        </counterContext.Provider>
-    )
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
 
-}
-
-export default CounterContext;
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
